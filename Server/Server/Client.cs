@@ -18,6 +18,7 @@ namespace Server
         {
             this.client = client;
             stream = new NetworkStream(client.Client);
+         
         }
 
         public void SetBufferSize(int size)
@@ -28,6 +29,11 @@ namespace Server
         public string GetIpClient()
         {
             return ((IPEndPoint)client.Client.LocalEndPoint).Address.ToString(); ;
+        }
+
+        public int Available()
+        {
+            return client.Available;
         }
     }
 }
