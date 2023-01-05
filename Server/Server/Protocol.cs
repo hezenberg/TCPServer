@@ -25,8 +25,8 @@ namespace Server
             }
             catch(IOException)
             {
-                client.status = false;
-                return "";
+                DisconnectClient(ref client);
+                return null;
             }
 
             string str_size = System.Text.Encoding.UTF8.GetString(size_package);
@@ -40,16 +40,24 @@ namespace Server
 
             while (total_size <= expected_size)
             {
-                if ((expected_size - total_size) < size_buffer_read)
+                try
                 {
-                    client.stream.Read(buffer_package, 0, (expected_size - total_size));
-                    Data += System.Text.Encoding.UTF8.GetString(buffer_package);
-                    return Data;
-                }
+                    if ((expected_size - total_size) < size_buffer_read)
+                    {
+                        client.stream.Read(buffer_package, 0, (expected_size - total_size));
+                        Data += System.Text.Encoding.UTF8.GetString(buffer_package);
+                        return Data;
+                    }
 
-                int size = client.stream.Read(buffer_package, 0, size_buffer_read);
-                total_size += size;
-                Data += System.Text.Encoding.UTF8.GetString(buffer_package);
+                    int size = client.stream.Read(buffer_package, 0, size_buffer_read);
+                    total_size += size;
+                    Data += System.Text.Encoding.UTF8.GetString(buffer_package);
+                }
+                catch(IOException)
+                {
+                    DisconnectClient(ref client);
+                    return null;
+                }
             }
 
             return Data;
@@ -59,6 +67,13 @@ namespace Server
         {
             byte[] w_buffer = Encoding.ASCII.GetBytes(data);
             client.stream.Write(w_buffer, 0, w_buffer.Length);
+        }
+
+        public static void DisconnectClient(ref Client client)
+        {
+            client.status = false;
+            client.stream.Close();
+            Console.WriteLine("Client {0} disconnected", client.GetIpClient());
         }
 
 

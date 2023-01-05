@@ -83,7 +83,7 @@ namespace Server
                     client.SetBufferSize(Protocol.size_buffer_read);
                     Clients.Add(client);
 
-                    Console.WriteLine("User: {0} connected", client.GetIpClient());
+                    Console.WriteLine("Client: {0} connected", client.GetIpClient());
                 }
                 else
                 {
@@ -103,7 +103,7 @@ namespace Server
                     Client client = DataForIter[i];
                     var msg = Protocol.StrRead(ref client);
                     
-                    if (client.status)
+                    if (client.status & msg != null)
                     {
                         Console.WriteLine(msg);
                     }

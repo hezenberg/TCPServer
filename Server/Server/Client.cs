@@ -4,6 +4,7 @@ using System.Threading;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Net;
 
 
 namespace Server
@@ -26,7 +27,7 @@ namespace Server
 
         public string GetIpClient()
         {
-            return "CLIENT";
+            return ((IPEndPoint)client.Client.LocalEndPoint).Address.ToString(); ;
         }
     }
 }
