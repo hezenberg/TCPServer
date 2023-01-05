@@ -12,11 +12,21 @@ namespace Server
     {
         private TcpClient client;
         public NetworkStream stream;
-
+        public bool status = true;
         public Client(TcpClient client)
         {
             this.client = client;
             stream = new NetworkStream(client.Client);
+        }
+
+        public void SetBufferSize(int size)
+        {
+            client.SendBufferSize = size;
+        }
+
+        public string GetIpClient()
+        {
+            return "CLIENT";
         }
     }
 }
