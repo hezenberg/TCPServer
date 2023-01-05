@@ -14,13 +14,20 @@ namespace Server
 
         public static string StrRead(ref Client client)
         {
+            if (client.stream.DataAvailable) // NEED SMART READER
+                return null;
+
             string Data = String.Empty;
             int expected_size = 0, total_size = 0;
             byte[] size_package = new byte[size_data_package];
             byte[] buffer_package = new byte[size_buffer_read];
 
+            
             try
             {
+                 Console.WriteLine(client.Available());
+                   
+                
                 client.stream.Read(size_package, 0, size_data_package);
             }
             catch(IOException)
