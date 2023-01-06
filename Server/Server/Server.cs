@@ -25,6 +25,7 @@ namespace Server
         private string LastError { get; set; } 
         // Список клиентов
         private List<Client> Clients;
+        private List<Thread> Threads;
         // Список каналов в которых находятся клиенты
         private List<List<Client>> Channels;
        
@@ -83,7 +84,8 @@ namespace Server
                     client.SetBufferSize(Protocol.size_buffer_read);
                     Clients.Add(client);
 
-                    Console.WriteLine("Client: {0} connected", client.GetIpClient());
+                    Console.WriteLine("Client: {0} connected, {1} clients on the server.", client.GetIpClient(), Clients.Count);
+                    
                 }
                 else
                 {
@@ -100,6 +102,7 @@ namespace Server
 
                 for (int i = 0; i < DataForIter.Count; i++)
                 {
+     
                     Client client = DataForIter[i];
                     var msg = Protocol.StrRead(ref client);
                     
