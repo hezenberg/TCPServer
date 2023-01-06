@@ -11,14 +11,14 @@ namespace Server
 {
     class Client
     {
-        private TcpClient client;
+       public TcpClient client;
         public NetworkStream stream;
         public bool status = true;
         public Client(TcpClient client)
         {
             this.client = client;
             stream = new NetworkStream(client.Client);
-         
+            
         }
 
         public void SetBufferSize(int size)
