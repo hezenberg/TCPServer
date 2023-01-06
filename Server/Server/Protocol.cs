@@ -14,9 +14,6 @@ namespace Server
 
         public static string StrRead(ref Client client)
         {
-            if (client.stream.DataAvailable) // NEED SMART READER
-                return null;
-
             string Data = String.Empty;
             int expected_size = 0, total_size = 0;
             byte[] size_package = new byte[size_data_package];
@@ -25,10 +22,7 @@ namespace Server
             
             try
             {
-                 Console.WriteLine(client.Available());
-                   
-                
-                client.stream.Read(size_package, 0, size_data_package);
+                client.stream.ReadAsync(size_package, 0, size_data_package);
             }
             catch(IOException)
             {
@@ -47,6 +41,7 @@ namespace Server
 
             while (total_size <= expected_size)
             {
+            
                 try
                 {
                     if ((expected_size - total_size) < size_buffer_read)
@@ -68,6 +63,7 @@ namespace Server
             }
 
             return Data;
+                
         }
 
         public static void StrWrite(ref Client client, string data)
