@@ -9,14 +9,12 @@ namespace Server
 {
     static class Protocol
     {
-
         public static int size_data_package = 5, size_buffer_read = 256;
-
 
         public static string StrRead(ref Client client)
         {
             string Data = String.Empty;
-            int expected_size = 0, total_size = 0;
+            int expected_size = 0, total_size = 0, size = 0;
             byte[] size_package = new byte[size_data_package];
             byte[] buffer_package = new byte[size_buffer_read];
 
@@ -54,18 +52,18 @@ namespace Server
             
                 try
                 {
-                    if ((expected_size - total_size) < size_buffer_read)
-                    {
-                        client.stream.Read(buffer_package, 0, (expected_size - total_size));
-                        Data += System.Text.Encoding.UTF8.GetString(buffer_package);
+                    if ((expected_size - total_size) < size_buffer_read){
+                    
+                        size = client.stream.Read(buffer_package, 0, (expected_size - total_size));
+                        Data += System.Text.Encoding.UTF8.GetString(buffer_package, 0, size);
                         return Data;
                     }
 
-                    int size = client.stream.Read(buffer_package, 0, size_buffer_read);
+                    size = client.stream.Read(buffer_package, 0, size_buffer_read);
                     total_size += size;
-                    Data += System.Text.Encoding.UTF8.GetString(buffer_package);
+                    Data += System.Text.Encoding.UTF8.GetString(buffer_package, 0, size);
                 }
-                catch(IOException e)
+                catch(IOException)
                 {
                     DisconnectClient(ref client);
                     return null;
@@ -78,6 +76,7 @@ namespace Server
 
         public static void StrWrite(ref Client client, string data)
         {
+            data = data.Trim();
             byte[] w_buffer = Encoding.ASCII.GetBytes(data);
             client.stream.Write(w_buffer, 0, w_buffer.Length);
         }
