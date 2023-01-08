@@ -9,6 +9,7 @@ namespace Server
 {
     static class Protocol
     {
+
         public static int size_data_package = 5, size_buffer_read = 256;
 
 
@@ -19,10 +20,15 @@ namespace Server
             byte[] size_package = new byte[size_data_package];
             byte[] buffer_package = new byte[size_buffer_read];
 
-            
+            /* Получение данных о размере будещего пакета.
+             * Если данных нет то функция вернет null и пойдет проверять следующего.
+             * Если будет вызванна ошибка ввода вывода клиент будет удален. */
             try
             {
-                client.stream.ReadAsync(size_package, 0, size_data_package);
+                if (client.IsDataExist())
+                    client.stream.Read(size_package, 0, size_data_package);
+                else
+                    return null;
             }
             catch(IOException)
             {
@@ -30,15 +36,19 @@ namespace Server
                 return null;
             }
 
+            /* Распаковка данных, если попытка преобразовать первые 5 байтов в int завершится провалом
+             * сервер вернет ошибку запроса, и переключится на другого клиента */
             string str_size = System.Text.Encoding.UTF8.GetString(size_package);
             if (!Int32.TryParse(str_size, out expected_size))
             {
                 Console.WriteLine("Bad request");
-                StrWrite(ref client, "400");
+                return null;
             }
 
-            expected_size++;
+            expected_size++; 
 
+            /* Считывание данных с сокета, считанно данных будет ровно столько сколько 
+             * было указанно в размере пакета. */
             while (total_size <= expected_size)
             {
             
@@ -55,7 +65,7 @@ namespace Server
                     total_size += size;
                     Data += System.Text.Encoding.UTF8.GetString(buffer_package);
                 }
-                catch(IOException)
+                catch(IOException e)
                 {
                     DisconnectClient(ref client);
                     return null;
@@ -72,14 +82,13 @@ namespace Server
             client.stream.Write(w_buffer, 0, w_buffer.Length);
         }
 
+        // Закрытие соединения с клиентов и установка статуса клиента на удаление
         public static void DisconnectClient(ref Client client)
         {
             client.status = false;
             client.stream.Close();
             Console.WriteLine("Client {0} disconnected", client.GetIpClient());
         }
-
-
   
     }
 }
