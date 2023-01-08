@@ -102,18 +102,15 @@ namespace Server
 
                 for (int i = 0; i < DataForIter.Count; i++)
                 {
-     
                     Client client = DataForIter[i];
                     var msg = Protocol.StrRead(ref client);
                     
                     if (client.status & msg != null)
-                    {
                         Console.WriteLine(msg);
-                    }
+                    else if (msg == null)
+                        continue;
                     else
-                    {
                         Clients.Remove(client);
-                    }
                 }
 
                 DataForIter = null;
