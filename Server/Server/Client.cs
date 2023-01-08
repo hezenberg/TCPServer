@@ -11,7 +11,7 @@ namespace Server
 {
     class Client
     {
-       public TcpClient client;
+        public TcpClient client;
         public NetworkStream stream;
         public bool status = true;
         public Client(TcpClient client)
@@ -26,14 +26,23 @@ namespace Server
             client.SendBufferSize = size;
         }
 
+        /* Возвращает IP клиента в строковом формате */
         public string GetIpClient()
         {
             return ((IPEndPoint)client.Client.LocalEndPoint).Address.ToString(); ;
         }
 
-        public int Available()
+        public bool IsDataExist()
         {
-            return client.Available;
+            try
+            {
+                return stream.DataAvailable;
+            }
+            catch
+            {
+                return true;
+            }
+
         }
     }
 }
