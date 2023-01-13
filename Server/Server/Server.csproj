@@ -43,6 +43,12 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+<<<<<<< Updated upstream
+=======
+    <Compile Include="MessageProtocol.cs" />
+    <Compile Include="Protocol.cs" />
+    <Compile Include="Server.cs" />
+>>>>>>> Stashed changes
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
