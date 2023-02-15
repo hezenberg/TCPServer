@@ -9,14 +9,8 @@ namespace Server
 {
     public class MessageProtocol : Protocol
     {
-        enum ErrorCode
-        {
-            BadRequest = 400
-        };
-
-     
-
-        public static string Read(ref Client client)
+       
+        public static string Read(Client client)
         {   
             string Data = String.Empty;
             int expected_size = 0, total_size = 0, size = 0;
@@ -35,7 +29,6 @@ namespace Server
             }
             catch(IOException)
             {
-                DisconnectClient(ref client);
                 return null;
             }
 
@@ -71,8 +64,6 @@ namespace Server
                 }
                 catch(IOException)
                 {
-                  
-                    DisconnectClient(ref client);
                     return null;
                 }
             }
@@ -81,7 +72,8 @@ namespace Server
                 
         }
 
-        public static void StrWrite(ref Client client, string data)
+
+        public static void StrWrite(Client client, string data)
         {
             data = data.Trim();
             byte[] w_buffer = Encoding.ASCII.GetBytes(data);

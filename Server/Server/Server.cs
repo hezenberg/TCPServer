@@ -25,39 +25,45 @@ namespace Server
         private string LastError { get; set; } 
         // Список клиентов
         private List<Client> Clients;
-        private List<Thread> Threads;
-        // Список каналов в которых находятся клиенты
-        private List<List<Client>> Channels;
        
         private int MaxConnection;
         private Thread MessageThread;
-
+        private Thread HandleDisconnected;
         private MessageProtocol MsgProtocol;
 
+        // Таймер через сколько сработает фильтр для удаления отключенных клиентов
+        public int TimeSecForFilter = 5;
         public Server(string ip, int port, int max_connect)
             : base(Net.IPAddress.Parse(ip), port)
         {
             MsgProtocol = new MessageProtocol();
         
-            this.MaxConnection = max_connect;
-            this.LastError = String.Empty;
-            this.Clients = new List<Client>();
+            MaxConnection = max_connect;
+            LastError = String.Empty;
+            Clients = new List<Client>();
+        
 
             try
             {
                 this.Start();
+
             }
             catch (SocketException e)
             {
                 this.LastError = "Block INIT: " + e.ToString();
             }
 
-            /* MAIN LOOP SERVER */
+            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("Server socket create!"); Console.ResetColor();
 
-            this.MessageThread = new Thread(this.HandleMessages);
-            this.MessageThread.Start();
-            this.HandleNewConnection();
+            /* Основные потоки сервера */
+            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("Started threads..."); Console.ResetColor();
+            MessageThread = new Thread(HandleMessages); MessageThread.Start();
+            HandleDisconnected = new Thread(FileterClients); HandleDisconnected.Start();
+            Console.ForegroundColor = ConsoleColor.Green; Console.WriteLine("Server started!"); Console.ResetColor();
 
+            /* Главный поток */
+            HandleNewConnection(); 
+            
         }
 
      
@@ -86,16 +92,26 @@ namespace Server
                     client.SetBufferSize(MessageProtocol.size_buffer_read);
                     Clients.Add(client);
 
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Client: {0} connected, {1} clients on the server.", client.GetIpClient(), Clients.Count);
-                    
+                    Console.ResetColor();
                 }
                 else
                 {
-                    Console.WriteLine("New client trying connect, limit connection!");
+                    Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("New client trying connect, limit connection!"); Console.ResetColor();
                 }
             }
         }   
 
+        /* Проверка клиентов на отключения через каждые TimeSecForFilter секунд */
+        private void FileterClients()
+        {   while(true)
+            {
+                Thread.Sleep(TimeSecForFilter * 1000);
+                Protocol.DeadClientFilter(this.Clients);
+            }
+                
+        }
         private void HandleMessages()
         {
             while (true)
@@ -105,23 +121,21 @@ namespace Server
                 for (int i = 0; i < DataForIter.Count; i++)
                 {
                     Client client = DataForIter[i];
-                    string msg = MessageProtocol.Read(ref client);
+                    string msg = MessageProtocol.Read(client);
 
-                    if (client.status & msg != null)
+                    if (msg != null)
                     {
-                        Console.WriteLine(msg);
+                        Console.ForegroundColor = ConsoleColor.Blue; Console.WriteLine(msg); Console.ResetColor();
                         for (int j = 0; j < DataForIter.Count; j++)
                         {
                             if (j == i)
                                 continue;
                             client = DataForIter[j];
-                            MessageProtocol.StrWrite(ref client, msg);
+                            MessageProtocol.StrWrite(client, msg);
                         }
                     }
-                    else if (msg == null)
-                        continue;
                     else
-                        Clients.Remove(client);
+                        continue;
 
                 }
 
