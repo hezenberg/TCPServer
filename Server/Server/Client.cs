@@ -13,7 +13,7 @@ namespace Server
     {
         public TcpClient client;
         public NetworkStream stream;
-  
+        public bool status_connect = true;
         public Client(TcpClient client)
         {
             this.client = client;

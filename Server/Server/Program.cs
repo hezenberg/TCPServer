@@ -39,7 +39,7 @@ namespace Server
             }
             catch(FileNotFoundException)
             {
-                Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Config file not found, server used defolt setting."); Console.ResetColor();
+                Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine("Config file not found, server used default setting."); Console.ResetColor();
                 ip = "127.0.0.1"; port = 80; max_conn = 100;
             }
        
@@ -49,6 +49,7 @@ namespace Server
 
         static void Main(string[] args)
         {
+           
             ReadCfgFileServer();
             var server = new Server(ip, port, max_conn);
             
