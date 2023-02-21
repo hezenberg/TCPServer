@@ -14,6 +14,10 @@ namespace Server
         public TcpClient client;
         public NetworkStream stream;
         public bool status_connect = true;
+
+        /* Хранит время последнего сообщения */
+        public long ticks_last_message = -1;
+        public long ticks_start_blocking = 0;
         public Client(TcpClient client)
         {
             this.client = client;
